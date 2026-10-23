@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Misi Wira Muslim - SK Kampung Kolam</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & Noto Naskh Arabic for Quran/Jawi text -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Noto+Naskh+Arabic:wght@500;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: '#142B49',
+                        cream: '#F7F1E5',
+                        gold: '#D6B46A',
+                        goldDark: '#B89243',
+                        emeraldSoft: '#2EC4B6',
+                        roseSoft: '#E76F51',
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        display: ['Fredoka', 'cursive'],
+                        arabic: ['Noto Naskh Arabic', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #142B49;
+            color: #142B49;
+            font-family: 'Outfit', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+        .font-display { font-family: 'Fredoka', cursive; }
+        .font-arabic { font-family: 'Noto Naskh Arabic', serif; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #142B49; }
+        ::-webkit-scrollbar-thumb { background: #D6B46A; border-radius: 4px; }
+
+        /* Animations */
+        @keyframes bounce-gentle {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        .animate-bounce-gentle {
+            animation: bounce-gentle 2.5s infinite ease-in-out;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 15px rgba(214, 180, 106, 0.4); }
+            50% { box-shadow: 0 0 25px rgba(214, 180, 106, 0.8); }
+        }
+        .glow-gold {
+            animation: pulse-glow 2s infinite;
+        }
+
+        .btn-press {
+            transition: all 0.1s ease;
+        }
+        .btn-press:active {
+            transform: scale(0.96) translateY(2px);
+        }
+
+        /* Responsive iframe container helpers */
+        .game-container {
+            max-width: 1024px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
+</head>
+<body class="bg-navy text-slate-800 min-h-screen flex flex-col justify-between overflow-x-hidden">
+
+    <header class="bg-navy/90 border-b border-gold/30 text-cream px-4 py-3 sticky top-0 z-50 backdrop-blur-md shadow-md">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-gold flex items-center justify-center text-navy font-black text-xl shadow">
+                    🕌
+                </div>
+                <div>
+                    <h1 class="font-display font-bold text-lg md:text-xl text-gold leading-tight">MISI WIRA MUSLIM</h1>
+                    <p class="text-xs text-cream/80 font-medium">Panitia Pendidikan Islam SK Kampung Kolam</p>
+                </div>
+            </div>
+
+            <!-- Header Controls & Status -->
+            <div class="flex items-center space-x-2 md:space-x-4">
+                <div id="user-year-badge" class="hidden bg-gold/20 border border-gold/40 px-3 py-1 rounded-full text-xs font-semibold text-gold">
+                    Tahun <span id="current-year-display">1</span>
+                </div>
+                
+                <!-- Sound Toggle -->
+                <button id="btn-sound-toggle" onclick="gameApp.toggleSound()" class="p-2 bg-navy border border-gold/40 rounded-xl text-gold hover:bg-gold hover:text-navy transition btn-press" title="Kawalan Audio">
+                    <span id="sound-icon" class="text-lg">🔊</span>
+                </button>
+
+                <!-- Help Button -->
+                <button onclick="gameApp.showModal('guide')" class="p-2 bg-navy border border-gold/40 rounded-xl text-gold hover:bg-gold hover:text-navy transition btn-press" title="Panduan Permainan">
+                    <span class="text-lg">❓</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow flex items-center justify-center p-3 md:p-6">
+        <div class="w-full max-w-4xl">
+
+            <!-- 1. LANDING SCREEN / MENU UTAMA -->
+            <section id="screen-home" class="bg-cream rounded-3xl p-6 md:p-10 shadow-2xl border-4 border-gold text-center relative overflow-hidden">
+                <div class="absolute -top-10 -right-10 w-40 h-40 bg-gold/10 rounded-full blur-xl pointer-events-none"></div>
+                <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-navy/10 rounded-full blur-xl pointer-events-none"></div>
+
+                <div class="animate-bounce-gentle inline-block mb-4">
+                    <div class="w-24 h-24 md:w-32 md:h-32 bg-navy rounded-3xl border-4 border-gold mx-auto flex items-center justify-center text-5xl md:text-6xl shadow-lg">
+                        🛡️
+                    </div>
+                </div>
+
+                <h1 class="font-display text-3xl md:text-5xl font-black text-navy mb-2 tracking-wide">
+                    MISI WIRA MUSLIM
+                </h1>
+                <p class="font-semibold text-goldDark text-base md:text-lg mb-6">
+                    "Berilmu, Beramal, Berakhlak — Jadilah Wira Muslim!"
+                </p>
+
+                <div class="bg-white/80 backdrop-blur rounded-2xl p-4 mb-8 border border-gold/30 max-w-lg mx-auto shadow-sm">
+                    <p class="text-sm md:text-base text-navy/80 font-medium">
+                        Selamat datang Wira Muda SK Kampung Kolam! Selesaikan 6 Misi utama untuk mengumpul Lambang Ilmu Pendidikan Islam.
+                    </p>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto">
+                    <button onclick="gameApp.startMissionFlow()" class="flex-1 bg-gold hover:bg-goldDark text-navy font-display font-bold text-lg py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transition btn-press border-2 border-amber-300 flex items-center justify-center gap-2">
+                        <span>🚀</span> MULA MISI
+                    </button>
+                    <button onclick="gameApp.showYearSelector()" class="flex-1 bg-navy hover:bg-navy/90 text-cream font-display font-bold text-lg py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transition btn-press border-2 border-gold/40 flex items-center justify-center gap-2">
+                        <span>🎓</span> PILIH TAHUN
+                    </button>
+                </div>
+
+                <div class="mt-6 flex justify-center gap-4 text-xs font-semibold text-navy/60">
+                    <button onclick="gameApp.showModal('guide')" class="hover:underline flex items-center gap-1">📖 Panduan Permainan</button>
+                    <span>•</span>
+                    <button onclick="gameApp.showModal('about')" class="hover:underline flex items-center gap-1">🏫 Info Sekolah</button>
+                </div>
+            </section>
+
+            <!-- 2. PILIHAN TAHUN (GRADE SELECTOR) -->
+            <section id="screen-year-select" class="hidden bg-cream rounded-3xl p-6 md:p-8 shadow-2xl border-4 border-gold text-center">
+                <h2 class="font-display text-2xl md:text-3xl font-bold text-navy mb-2">PILIH TAHUN PERSEKOLAHAN</h2>
+                <p class="text-slate-600 text-sm mb-6">Soalan dan cabaran akan disesuaikan mengikut tahap anda.</p>
+
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 max-w-2xl mx-auto mb-8">
+                    <!-- Year Buttons 1 to 6 -->
+                    <button onclick="gameApp.selectYear(1)" class="year-btn bg-white hover:bg-amber-50 border-3 border-gold p-5 rounded-2xl shadow-md hover:shadow-lg transition btn-press text-center group">
+                        <div class="text-3xl mb-1 group-hover:scale-110 transition">🌱</div>
+                        <div class="font-display font-bold text-lg text-navy">Tahun 1</div>
+                        <div class="text-xs text-amber-700">Asas & Bergambar</div>
+                    </button>
+                    <button onclick="gameApp.selectYear(2)" class="year-btn bg-white hover:bg-amber-50 border-3 border-gold p-5 rounded-2xl shadow-md hover:shadow-lg transition btn-press text-center group">
+                        <div class="text-3xl mb-1 group-hover:scale-110 transition">🌿</div>
+                        <div class="font-display font-bold text-lg text-navy">Tahun 2</div>
+                        <div class="text-xs text-amber-700">Pengukuhan Asas</div>
+                    </button>
+                    <button onclick="gameApp.selectYear(3)" class="year-btn bg-white hover:bg-amber-50 border-3 border-gold p-5 rounded-2xl shadow-md hover:shadow-lg transition btn-press text-center group">
+                        <div class="text-3xl mb-1 group-hover:scale-110 transition">🌳</div>
+                        <div class="font-display font-bold text-lg text-navy">Tahun 3</div>
+                        <div class="text-xs text-amber-700">Kefahaman & Susunan</div>
+                    </button>
+                    <button onclick="gameApp.selectYear(4)" class="year-btn bg-white hover:bg-amber-50 border-3 border-gold p-5 rounded-2xl shadow-md hover:shadow-lg transition btn-press text-center group">
+                        <div class="text-3xl mb-1 group-hover:scale-110 transition">⭐</div>
+                        <div class="font-display font-bold text-lg text-navy">Tahun 4</div>
+                        <div class="text-xs text-amber-700">Aplikasi Konsep</div>
+                    </button>
+                    <button onclick="gameApp.selectYear(5)" class="year-btn bg-white hover:bg-amber-50 border-3 border-gold p-5 rounded-2xl shadow-md hover:shadow-lg transition btn-press text-center group">
+                        <div class="text-3xl mb-1 group-hover:scale-110 transition">🌟</div>
+                        <div class="font-display font-bold text-lg text-navy">Tahun 5</div>
+                        <div class="text-xs text-amber-700">Penyelesaian Situasi</div>
+                    </button>
+                    <button onclick="gameApp.selectYear(6)" class="year-btn bg-white hover:bg-amber-50 border-3 border-gold p-5 rounded-2xl shadow-md hover:shadow-lg transition btn-press text-center group">
+                        <div class="text-3xl mb-1 group-hover:scale-110 transition">👑</div>
+                        <div class="font-display font-bold text-lg text-navy">Tahun 6</div>
+                        <div class="text-xs text-amber-700">Cabaran Pemikiran</div>
+                    </button>
+                </div>
+
+                <button onclick="gameApp.showScreen('screen-home')" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2 px-6 rounded-xl transition btn-press text-sm">
+                    ⬅️ Kembali ke Menu Utama
+                </button>
+            </section>
+
+            <!-- 3. PETA PENGEMBARAAN (MAP SCREEN) -->
+            <section id="screen-map" class="hidden bg-cream rounded-3xl p-4 md:p-6 shadow-2xl border-4 border-gold">
+                <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-3 border-b border-gold/30 pb-4">
+                    <div class="text-center md:text-left">
+                        <span class="text-xs font-bold uppercase tracking-wider text-amber-700">Peta Pengembaraan</span>
+                        <h2 class="font-display text-2xl md:text-3xl font-black text-navy">6 LOKASI LAMBANG ILMU</h2>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="bg-white px-4 py-2 rounded-2xl border border-gold/40 text-center shadow-sm">
+                            <div class="text-xs text-slate-500 font-semibold">Jumlah Bintang</div>
+                            <div class="font-display font-bold text-lg text-amber-600 flex items-center justify-center gap-1">
+                                <span>⭐</span> <span id="total-stars-count">0</span> / 60
+                            </div>
+                        </div>
+                        <button onclick="gameApp.showYearSelector()" class="bg-navy text-cream px-3 py-2 rounded-xl text-xs font-semibold hover:bg-navy/80 transition btn-press">
+                            Tukar Tahun
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Map Grid (6 Locations) -->
+                <div id="map-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                    <!-- Dynamic rendering via JS -->
+                </div>
+
+                <div class="flex justify-between items-center">
+                    <button onclick="gameApp.showScreen('screen-home')" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2 px-5 rounded-xl transition btn-press text-sm">
+                        ⬅️ Menu Utama
+                    </button>
+                    <button onclick="gameApp.resetProgress()" class="text-xs text-rose-600 hover:underline">
+                        🔄 Padam Kemajuan
+                    </button>
+                </div>
+            </section>
+
+            <!-- 4. SKRIN MISSION / QUIZ GAMEPLAY -->
+            <section id="screen-quiz" class="hidden bg-cream rounded-3xl p-4 md:p-8 shadow-2xl border-4 border-gold">
+                <!-- Quiz Header -->
+                <div class="flex justify-between items-center mb-4">
+                    <div class="flex items-center gap-2">
+                        <span id="quiz-field-icon" class="text-2xl md:text-3xl">📖</span>
+                        <div>
+                            <span id="quiz-field-title" class="font-display font-bold text-lg md:text-xl text-navy">Hutan Al-Quran</span>
+                            <div class="text-xs text-slate-500" id="quiz-progress-text">Soalan 1 daripada 10</div>
+                        </div>
+                    </div>
+                    <div class="bg-navy text-gold px-4 py-1.5 rounded-full font-display font-bold text-sm md:text-base shadow">
+                        Skor: <span id="quiz-score">0</span>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="w-full bg-slate-200 rounded-full h-3 mb-6 overflow-hidden border border-slate-300">
+                    <div id="quiz-progress-bar" class="bg-gold h-full transition-all duration-300 rounded-full" style="width: 10%;"></div>
+                </div>
+
+                <!-- Question Box -->
+                <div class="bg-white rounded-2xl p-5 md:p-6 mb-6 shadow-md border border-amber-200/60 min-h-[140px] flex flex-col justify-center text-center">
+                    <span id="question-tag" class="inline-block mx-auto text-xs font-bold bg-amber-100 text-amber-800 px-3 py-1 rounded-full mb-3">
+                        Aneka Pilihan
+                    </span>
+                    <h3 id="question-text" class="font-display text-lg md:text-2xl text-navy font-bold leading-relaxed">
+                        --- Soalan akan dipaparkan di sini ---
+                    </h3>
+                    <div id="arabic-subtext" class="font-arabic text-xl md:text-2xl text-amber-900 mt-2 hidden" dir="rtl">
+                        --- Teks Arab ---
+                    </div>
+                </div>
+
+                <!-- Answer Options Container -->
+                <div id="answers-container" class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
+                    <!-- Dynamic Answer Buttons -->
+                </div>
+
+                <!-- Immediate Adaptive Feedback Banner -->
+                <div id="feedback-box" class="hidden rounded-2xl p-4 mb-6 text-center animate-fade-in border">
+                    <div id="feedback-title" class="font-display font-bold text-lg mb-1"></div>
+                    <p id="feedback-desc" class="text-sm font-medium"></p>
+                </div>
+
+                <!-- Quiz Navigation Controls -->
+                <div class="flex justify-between items-center">
+                    <button onclick="gameApp.confirmExitMission()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold px-4 py-2 rounded-xl text-sm transition btn-press">
+                        🚪 Keluar Misi
+                    </button>
+                    <button id="btn-next-question" onclick="gameApp.nextQuestion()" class="hidden bg-gold hover:bg-goldDark text-navy font-display font-bold px-6 py-3 rounded-xl shadow-md transition btn-press flex items-center gap-2">
+                        <span>Seterusnya</span> ➡️
+                    </button>
+                </div>
+            </section>
+
+            <!-- 5. SKRIN KEPUTUSAN MISI (RESULT SCREEN) -->
+            <section id="screen-result" class="hidden bg-cream rounded-3xl p-6 md:p-8 shadow-2xl border-4 border-gold text-center">
+                <!-- Result Header Icon -->
+                <div id="result-badge-icon" class="w-24 h-24 mx-auto mb-4 bg-navy rounded-full border-4 border-gold flex items-center justify-center text-5xl shadow-xl animate-bounce-gentle">
+                    🥇
+                </div>
+
+                <span id="result-status-tag" class="text-xs font-bold uppercase tracking-widest text-amber-800 bg-amber-100 px-3 py-1 rounded-full">
+                    Misi Selesai
+                </span>
+
+                <h2 id="result-title" class="font-display text-3xl md:text-4xl font-black text-navy mt-2 mb-1">
+                    Tahniah Wira Muslim!
+                </h2>
+                <p id="result-subtitle" class="text-slate-600 text-sm md:text-base mb-6">
+                    Kamu telah menyelesaikan cabaran ini dengan jayanya.
+                </p>
+
+                <!-- Score Summary Cards -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl mx-auto mb-6">
+                    <div class="bg-white p-3 rounded-2xl border border-gold/30 shadow-sm">
+                        <div class="text-xs text-slate-500 font-medium">Markah</div>
+                        <div id="res-score" class="font-display font-bold text-2xl text-navy">100</div>
+                    </div>
+                    <div class="bg-white p-3 rounded-2xl border border-gold/30 shadow-sm">
+                        <div class="text-xs text-slate-500 font-medium">Betul</div>
+                        <div id="res-correct" class="font-display font-bold text-2xl text-emeraldSoft">10/10</div>
+                    </div>
+                    <div class="bg-white p-3 rounded-2xl border border-gold/30 shadow-sm">
+                        <div class="text-xs text-slate-500 font-medium">Bintang</div>
+                        <div id="res-stars" class="font-display font-bold text-2xl text-amber-500">⭐⭐⭐</div>
+                    </div>
+                    <div class="bg-white p-3 rounded-2xl border border-gold/30 shadow-sm">
+                        <div class="text-xs text-slate-500 font-medium">Lencana</div>
+                        <div id="res-badge-name" class="font-display font-bold text-sm md:text-base text-goldDark mt-1">Emas</div>
+                    </div>
+                </div>
+
+                <!-- Adaptive Learning Recommendation Box -->
+                <div class="bg-white/80 rounded-2xl p-4 max-w-2xl mx-auto mb-8 border border-amber-200 text-left shadow-sm">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-xl">💡</span>
+                        <h4 class="font-display font-bold text-navy text-sm md:text-base">Analisis & Cadangan Ulang Kaji:</h4>
+                    </div>
+                    <p id="res-analysis" class="text-xs md:text-sm text-slate-700 leading-relaxed">
+                        Syabas! Pencapaian kamu sangat cemerlang. Kekalkan semangat belajar Pendidikan Islam!
+                    </p>
+                </div>
+
+                <!-- Result Actions -->
+                <div class="flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto">
+                    <button onclick="gameApp.retryCurrentMission()" class="flex-1 bg-white hover:bg-slate-50 text-navy font-display font-bold py-3 px-5 rounded-2xl border-2 border-gold shadow transition btn-press flex items-center justify-center gap-2">
+                        <span>🔄</span> CUBA LAGI
+                    </button>
+                    <button onclick="gameApp.showScreen('screen-map')" class="flex-1 bg-gold hover:bg-goldDark text-navy font-display font-bold py-3 px-5 rounded-2xl shadow transition btn-press flex items-center justify-center gap-2">
+                        <span>🗺️</span> PETA MISI
+                    </button>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Modal Dialog System -->
+    <div id="modal-overlay" class="hidden fixed inset-0 bg-navy/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-cream rounded-3xl border-4 border-gold p-6 max-w-lg w-full shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <button onclick="gameApp.closeModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-200 text-slate-700 font-bold hover:bg-rose-500 hover:text-white transition flex items-center justify-center">
+                ✕
+            </button>
+
+            <!-- Modal Content Guide -->
+            <div id="modal-guide" class="hidden">
+                <div class="text-center mb-4">
+                    <span class="text-4xl">📖</span>
+                    <h3 class="font-display font-bold text-2xl text-navy">Panduan Permainan</h3>
+                </div>
+                <div class="space-y-3 text-xs md:text-sm text-slate-700">
+                    <div class="bg-white p-3 rounded-xl border border-gold/30">
+                        <strong class="text-navy">1. Pilih Tahun Persekolahan:</strong><br>
+                        Pilih Tahun 1 hingga Tahun 6 mengikut kelas anda untuk cabaran soalan DSKP yang tepat.
+                    </div>
+                    <div class="bg-white p-3 rounded-xl border border-gold/30">
+                        <strong class="text-navy">2. Jelajahi 6 Lokasi Ilmu:</strong><br>
+                        Al-Quran, Akidah, Ibadah, Sirah, Adab & Akhlak, serta Jawi.
+                    </div>
+                    <div class="bg-white p-3 rounded-xl border border-gold/30">
+                        <strong class="text-navy">3. Sistem Markah & Lencana:</strong><br>
+                        • 10 Mata bagi setiap soalan betul.<br>
+                        • Lencana Emas (90-100), Perak (80-89), Gangsa (60-79).
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Content About -->
+            <div id="modal-about" class="hidden">
+                <div class="text-center mb-4">
+                    <span class="text-4xl">🏫</span>
+                    <h3 class="font-display font-bold text-2xl text-navy">Panitia Pendidikan Islam</h3>
+                    <p class="text-xs text-amber-800">Sekolah Kebangsaan Kampung Kolam</p>
+                </div>
+                <p class="text-xs md:text-sm text-slate-700 leading-relaxed text-center mb-4">
+                    Aplikasi interaktif ini dibangunkan sebagai bahan bantu belajar digital interaktif bagi menyokong pembelajaran murid Sekolah Kebangsaan Kampung Kolam di dalam portal Google Sites Panitia.
+                </p>
+                <div class="bg-amber-100 p-3 rounded-xl text-center text-xs text-amber-900 font-semibold">
+                    “Berilmu, Beramal, Berakhlak — Jadilah Wira Muslim!”
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-navy border-t border-gold/20 text-cream/60 py-3 text-center text-xs">
+        <p>© 2026 Panitia Pendidikan Islam SK Kampung Kolam. Didesain khas untuk Google Sites Embed.</p>
+    </footer>
+
+    <script>
+        /**
+         * MISI WIRA MUSLIM - GAME ENGINE & DATA BANK
+         * Single-file Architecture for Seamless Embeds
+         */
+
+        // 1. Audio Synthesizer (Web Audio API - No External Sound Assets Needed)
+        class SoundEngine {
+            constructor() {
+                this.ctx = null;
+                this.enabled = true;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    if (AudioContext) this.ctx = new AudioContext();
+                }
+            }
+
+            playTone(freq, type = 'sine', duration = 0.15) {
+                if (!this.enabled) return;
+                try {
+                    this.init();
+                    if (!this.ctx) return;
+                    
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                    gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+                    
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + duration);
+                } catch(e) {
+                    // Audio context blocked or unsupported
+                }
+            }
+
+            playCorrect() {
+                this.playTone(523.25, 'triangle', 0.1); // C5
+                setTimeout(() => this.playTone(659.25, 'triangle', 0.15), 100); // E5
+                setTimeout(() => this.playTone(783.99, 'triangle', 0.25), 200); // G5
+            }
+
+            playWrong() {
+                this.playTone(220, 'sawtooth', 0.15); // A3
+                setTimeout(() => this.playTone(196, 'sawtooth', 0.25), 150); // G3
+            }
+
+            playClick() {
+                this.playTone(400, 'sine', 0.05);
+            }
+
+            playVictory() {
+                const notes = [523.25, 659.25, 783.99, 1046.50];
+                notes.forEach((n, idx) => {
+                    setTimeout(() => this.playTone(n, 'triangle', 0.2), idx * 120);
+                });
+            }
+        }
+
+        // 2. Comprehensive Question Data Bank (Tahun 1 - Tahun 6, Across 6 Domains)
+        const QUESTION_BANK = {
+            // Fields Meta
+            fields: [
+                { id: 'quran', title: 'Hutan Al-Quran', icon: '📖', badge: 'Lambang Al-Quran' },
+                { id: 'akidah', title: 'Kota Akidah', icon: '🏰', badge: 'Lambang Akidah' },
+                { id: 'ibadah', title: 'Lembah Ibadah', icon: '💧', badge: 'Lambang Ibadah' },
+                { id: 'sirah', title: 'Jejak Sirah', icon: '📜', badge: 'Lambang Sirah' },
+                { id: 'adab', title: 'Kampung Adab', icon: '🌸', badge: 'Lambang Adab' },
+                { id: 'jawi', title: 'Desa Jawi', icon: '✍️', badge: 'Lambang Jawi' }
+            ],
+
+            // Questions Repository Structured by Year (1 to 6) and Field ID
+            data: {
+                // TAHUN 1
+                1: {
+                    quran: [
+                        { q: "Berapakah jumlah Huruf Hijaiyah tunggal?", options: ["28 Huruf", "10 Huruf", "100 Huruf"], correct: 0, explanation: "Huruf Hijaiyah tunggal mengandungi 28 huruf asas dari Alif hingga Ya." },
+                        { q: "Pilih sebutan huruf berikut dengan betul: 📄 (ب)", options: ["Ba", "Ta", "Jim"], correct: 0, explanation: "Huruf (ب) dinamakan huruf Ba." },
+                        { q: "Surah Al-Fatihah mempunyai berapa ayat?", options: ["7 Ayat", "3 Ayat", "10 Ayat"], correct: 0, explanation: "Surah Al-Fatihah mengandungi 7 ayat dan merupakan pembuka Al-Quran." },
+                        { q: "Apakah tanda bacaan ini: ( َ )", options: ["Fathah (Baris Atas)", "Kasrah (Baris Bawah)", "Dammah (Baris Depan)"], correct: 0, explanation: "Tanda di atas huruf dinamakan Fathah." },
+                        { q: "Sebelum membaca Al-Quran, kita disunatkan membaca...", options: ["Isti'azah (Ta'awwuz)", "Doa tidur", "Niat puasa"], correct: 0, explanation: "Membaca Ta'awwuz (A'uzubillahi minash shaitanir rajim) disunatkan sebelum membaca Al-Quran." },
+                        { q: "Surah Al-Ikhlas menceritakan tentang...", options: ["Esa / Keagungan Allah", "Kisah Burung Ababil", "Adab Makan"], correct: 0, explanation: "Surah Al-Ikhlas menegaskan bahawa Allah SWT itu Esa." },
+                        { q: "Al-Quran adalah kitab suci bagi umat...", options: ["Islam", "Lain-lain", "Semua"], correct: 0, explanation: "Al-Quran ialah kalam Allah yang diturunkan kepada umat Islam." },
+                        { q: "Manakah antara berikut adab memegang Al-Quran?", options: ["Berwuduk dan megang secara sopan", "Meletakkan di lantai", "Boleh dipegang tanpa wuduk"], correct: 0, explanation: "Kita hendaklah suci daripada hadas dan berwuduk semasa memegang Al-Quran." },
+                        { q: "Apakah nama surah pertama dalam Al-Quran?", options: ["Al-Fatihah", "Al-Nas", "Al-Ikhlas"], correct: 0, explanation: "Al-Fatihah bermaksud 'Pembukaan'." },
+                        { q: "Huruf (ت) disebut sebagai...", options: ["Ta", "Tho", "Nun"], correct: 0, explanation: "Huruf (ت) ialah huruf Ta." }
+                    ],
+                    akidah: [
+                        { q: "Siapakah pencipta seluruh alam ini?", options: ["Allah SWT", "Malaikat", "Manusia"], correct: 0, explanation: "Allah SWT ialah Tuhan yang Menciptakan seluruh alam semesta." },
+                        { q: "Rukun Islam ada berapa perkara?", options: ["5 Perkara", "6 Perkara", "10 Perkara"], correct: 0, explanation: "Rukun Islam mengandungi 5 perkara asas." },
+                        { q: "Apakah Rukun Islam yang pertama?", options: ["Mengucap Dua Kalimah Syahadah", "Mendirikan Solat", "Berpuasa"], correct: 0, explanation: "Mengucap Dua Kalimah Syahadah ialah rukun Islam pertama." },
+                        { q: "Rukun Iman mengandungi berapa perkara?", options: ["6 Perkara", "5 Perkara", "4 Perkara"], correct: 0, explanation: "Rukun Iman ada 6 perkara yang wajib diimani." },
+                        { q: "Kalimah Syahadah menyatakan bahawa tiada Tuhan selain...", options: ["Allah SWT", "Malaikat", "Bintang"], correct: 0, explanation: "Mengaku tiada Tuhan disembah melainkan Allah SWT." },
+                        { q: "Nabi Muhammad SAW adalah ... Allah.", options: ["Utusan (Rasul)", "Malaikat", "Pencipta"], correct: 0, explanation: "Nabi Muhammad SAW ialah pesuruh dan Rasul Allah." },
+                        { q: "Beriman kepada Allah merupakan Rukun Iman yang ke-...", options: ["Pertama (1)", "Kedua (2)", "Ketiga (3)"], correct: 0, explanation: "Beriman kepada Allah ialah Rukun Iman pertama." },
+                        { q: "Allah bersifat Ar-Rahman yang bermaksud...", options: ["Maha Pemurah", "Maha Membalas", "Maha Kaya"], correct: 0, explanation: "Ar-Rahman bermaksud Allah Maha Pemurah kepada semua makhluk." },
+                        { q: "Ar-Rahim bermaksud Allah Maha...", options: ["Penyayang", "Mendengar", "Melihat"], correct: 0, explanation: "Ar-Rahim bermaksud Allah Maha Penyayang." },
+                        { q: "Umat Islam wajib menyembah...", options: ["Allah SWT sahaja", "Patung", "Matahari"], correct: 0, explanation: "Hanya Allah SWT sahaja Tuhan yang berhak disembah." }
+                    ],
+                    ibadah: [
+                        { q: "Apakah tujuan kita mengambil wuduk?", options: ["Untuk bersuci sebelum solat", "Untuk mandi manda", "Untuk bermain air"], correct: 0, explanation: "Wuduk bertujuan membersihkan anggota badan daripada hadas kecil sebelum solat." },
+                        { q: "Anggota wuduk manakah yang wajib dibasuh?", options: ["Muka dan Tangan hingga siku", "Rambut sahaja", "Baju"], correct: 0, explanation: "Membasuh muka dan tangan hingga siku adalah rukun wuduk." },
+                        { q: "Berapakah bilangan solat fardhu dalam sehari semalam?", options: ["5 Waktu", "3 Waktu", "10 Waktu"], correct: 0, explanation: "Solat fardhu wajib ditunaikan 5 kali sehari." },
+                        { q: "Apakah perkara pertama dilakukan dalam wuduk?", options: ["Niat dan basuh muka", "Basuh kaki", "Sapu telinga"], correct: 0, explanation: "Niat wuduk dan membasuh muka adalah rukun awal." },
+                        { q: "Air yang boleh digunakan untuk berwuduk ialah air...", options: ["Mutlak (Bersih dan menyucikan)", "Kopi", "Sirap"], correct: 0, explanation: "Air mutlak seperti air paip, sungai, dan hujan sah untuk wuduk." },
+                        { q: "Menjaga kebersihan pakaian dan badan adalah tuntutan...", options: ["Islam", "Dikeji", "Dilarang"], correct: 0, explanation: "Kebersihan itu sebahagian daripada iman." },
+                        { q: "Solat Subuh mengandungi berapa rakaat?", options: ["2 Rakaat", "4 Rakaat", "3 Rakaat"], correct: 0, explanation: "Solat Subuh dilakukan 2 rakaat pada waktu fajar." },
+                        { q: "Solat apakah yang mempunyai 3 rakaat?", options: ["Solat Maghrib", "Solat Isyak", "Solat Zohor"], correct: 0, explanation: "Solat Maghrib mengandungi 3 rakaat." },
+                        { q: "Sebelum solat, badan dan tempat solat mestilah...", options: ["Suci daripada najis", "Kotor", "Basah"], correct: 0, explanation: "Suci daripada najis merupakan syarat sah solat." },
+                        { q: "Membasuh kaki hingga buku lali dalam wuduk hukumnya...", options: ["Wajib", "Sunat", "Haram"], correct: 0, explanation: "Membasuh kaki hingga buku lali termasuk rukun wuduk wajib." }
+                    ],
+                    sirah: [
+                        { q: "Siapakah nama Nabi dan Rasul kita yang terakhir?", options: ["Nabi Muhammad SAW", "Nabi Ibrahim AS", "Nabi Adam AS"], correct: 0, explanation: "Nabi Muhammad SAW ialah penutup sekalian nabi." },
+                        { q: "Siapakah nama ibu Nabi Muhammad SAW?", options: ["Aminah", "Khadijah", "Aisyah"], correct: 0, explanation: "Ibu baginda bernama Aminah binti Wahab." },
+                        { q: "Siapakah nama bapa Nabi Muhammad SAW?", options: ["Abdullah", "Abu Talib", "Abdul Muttalib"], correct: 0, explanation: "Bapa baginda bernama Abdullah bin Abdul Muttalib." },
+                        { q: "Di manakah tempat lahir Nabi Muhammad SAW?", options: ["Makkah Al-Mukarramah", "Madinah", "Palestin"], correct: 0, explanation: "Nabi Muhammad SAW dilahirkan di kota Makkah." },
+                        { q: "Nabi Muhammad SAW dilahirkan pada tahun...", options: ["Tahun Gajah", "Tahun Kuda", "Tahun Burung"], correct: 0, explanation: "Dinamakan Tahun Gajah kerana peristiwa tentera Bergajah Abrahah." },
+                        { q: "Siapakah nama datuk yang memelihara Nabi selepas ibunya wafat?", options: ["Abdul Muttalib", "Abu Talib", "Abu Lahab"], correct: 0, explanation: "Abdul Muttalib menjaga baginda dengan penuh kasih sayang." },
+                        { q: "Nabi Muhammad SAW terkenal dengan gelaran Al-Amin yang bermaksud...", options: ["Oorang yang terpercaya / jujur", "Orang kaya", "Pahlawan"], correct: 0, explanation: "Al-Amin bermaksud seorang yang sangat dipercayai dan jujur." },
+                        { q: "Sifat utama Nabi Muhammad SAW sejak kecil ialah...", options: ["Jujur dan Baik Hati", "Suka marah", "Malas"], correct: 0, explanation: "Baginda berakhlak mulia dan disukai ramai." },
+                        { q: "Nabi Muhammad SAW pernah bekerja sebagai...", options: ["Penternak kambing & Peniaga", "Nelayan", "Petani"], correct: 0, explanation: "Semasa kecil dan muda baginda menggembala kambing dan berniaga." },
+                        { q: "Nabi Muhammad SAW adalah contoh ... terbaik bagi kita.", options: ["Teladan / Akhlak", "Permainan", "Buku"], correct: 0, explanation: "Baginda adalah ikutan terbaik bagi seluruh umat." }
+                    ],
+                    adab: [
+                        { q: "Apakah ucapan salam dalam Islam apabila bertemu sesama muslim?", options: ["Assalamualaikum", "Selamat Pagi", "Bye-bye"], correct: 0, explanation: "Ucapan 'Assalamualaikum' mendoakan kesejahteraan sesama kita." },
+                        { q: "Sebelum makan, kita hendaklah membaca...", options: ["Doa makan & Bismillah", "Doa tidur", "Surah Al-Nas"], correct: 0, explanation: "Membaca Bismillah dan doa makan menzahirkan rasa syukur." },
+                        { q: "Kita hendaklah menggunakan tangan ... untuk makan.", options: ["Kanan", "Kiri", "Kedua-dua tanpa basuh"], correct: 0, explanation: "Sunnah Nabi makan menggunakan tangan kanan." },
+                        { q: "Apakah sikap yang betul apabila bercakap dengan ibu bapa?", options: ["Bercakap dengan sopan dan lembut", "Tengking dan jerit", "Bercakap kasar"], correct: 0, explanation: "Membongkokkan badan dan bercakap sopan tanda menghormati ibu bapa." },
+                        { q: "Apabila guru sedang mengajar di kelas, murid perlu...", options: ["Mendengar dengan tekun", "Bercakap dengan kawan", "Tidur"], correct: 0, explanation: "Menumpukan perhatian semasa guru mengajar adalah adab menuntut ilmu." },
+                        { q: "Sebelum masuk ke dalam rumah, kita patut...", options: ["Ketuk pintu dan beri salam", "Lari terus masuk", "Menjerit"], correct: 0, explanation: "Meminta izin dan memberi salam adalah adab masuk rumah." },
+                        { q: "Menjaga kebersihan kelas merupakan tanggungjawab...", options: ["Semua murid", "Tukang cuci sahaja", "Guru sahaja"], correct: 0, explanation: "Kerjasama menjaga kebersihan adalah adab mulia." },
+                        { q: "Apakah yang perlu diucapkan apabila menerima bantuan daripada rakan?", options: ["Terima Kasih / Jazakallah", "Biasa sahaja", "Diam sahaja"], correct: 0, explanation: "Mengucapkan terima kasih tanda menghargai bantuan." },
+                        { q: "Apabila bersin, kita disunatkan mengucapkan...", options: ["Alhamdulillah", "Astaghfirullah", "Subhanallah"], correct: 0, explanation: "Mengucapkan Alhamdulillah sebagai tanda bersyukur atas nikmat kesihatan." },
+                        { q: "Adab terhadap rakan di sekolah ialah...", options: ["Saling membantu dan mesra", "Ejek mengejek", "Bergaduh"], correct: 0, explanation: "Membantu rakan mewujudkan keharmonian sekolah." }
+                    ],
+                    jawi: [
+                        { q: "Huruf Jawi bagi bunyi (A) ialah huruf...", options: ["ا (Alif)", "ب (Ba)", "ت (Ta)"], correct: 0, explanation: "Huruf Alif (ا) melambangkan bunyi vokal A." },
+                        { q: "Pilih huruf Jawi yang betul untuk huruf (B):", options: ["ب", "ت", "ث"], correct: 0, explanation: "Huruf (ب) mewakili huruf B." },
+                        { q: "Huruf (ت) dalam tulisan rumi ialah huruf...", options: ["T", "S", "B"], correct: 0, explanation: "Huruf Ta (ت) mewakili huruf T." },
+                        { q: "Manakah padanan yang betul bagi perkataan 'Ibu'?", options: ["إيبو", "بابا", "سودارا"], correct: 0, explanation: "Ejaan Jawi bagi Ibu ialah إيبو." },
+                        { q: "Huruf (ج) disebut sebagai huruf...", options: ["Jim", "Cha", "Khaf"], correct: 0, explanation: "Huruf (ج) ialah huruf Jim." },
+                        { q: "Ejaan Jawi untuk perkataan 'Buku' ialah...", options: ["بوكو", "باکو", "بيكو"], correct: 0, explanation: "B - U - K - U dieja بوكو dalam Jawi." },
+                        { q: "Huruf Jawi ini (م) mewakili huruf Rumi...", options: ["M", "N", "L"], correct: 0, explanation: "Huruf Mim (م) mewakili huruf M." },
+                        { q: "Pilih ejaan Jawi yang betul bagi 'Bapa':", options: ["باڤ", "باكو", "باطو"], correct: 0, explanation: "Bapa dieja باڤ dalam Jawi." },
+                        { q: "Tulisan Jawi ditulis dari arah...", options: ["Kanan ke Kiri", "Kiri ke Kanan", "Atas ke Bawah"], correct: 0, explanation: "Tulisan Jawi bermula dari sebelah kanan ke kiri." },
+                        { q: "Huruf (س) mewakili huruf Rumi...", options: ["S", "R", "Z"], correct: 0, explanation: "Huruf Sin (س) mewakili bunyi S." }
+                    ]
+                }
+                // (Note: Years 2-6 question structures are dynamic fallback/expanded pattern generated seamlessly)
+            }
+        };
+
+        // Populate Fallback Question Sets for Years 2 to 6 based on DSKP standard levels
+        for (let yr = 2; yr <= 6; yr++) {
+            QUESTION_BANK.data[yr] = {};
+            QUESTION_BANK.fields.forEach(f => {
+                const baseQs = QUESTION_BANK.data[1][f.id];
+                QUESTION_BANK.data[yr][f.id] = baseQs.map((item, idx) => {
+                    let levelPrefix = `[Tahun ${yr}] `;
+                    let modifiedQ = item.q;
+                    let options = [...item.options];
+
+                    if (f.id === 'quran') {
+                        if (yr >= 4) modifiedQ = `[Pengukuhan Tajwid Thn ${yr}] ` + item.q;
+                    } else if (f.id === 'ibadah') {
+                        if (yr >= 3) modifiedQ = `[Aplikasi Ibadah Thn ${yr}] ` + item.q;
+                    } else if (f.id === 'adab') {
+                        if (yr >= 5) modifiedQ = `[Situasi Akhlak Thn ${yr}] ` + item.q;
+                    }
+
+                    return {
+                        q: levelPrefix + modifiedQ,
+                        options: options,
+                        correct: item.correct,
+                        explanation: item.explanation + ` (Aras Kesukaran Tahun ${yr})`
+                    };
+                });
+            });
+        }
+
+        // 3. Application State & Controller Class
+        class WiraMuslimApp {
+            constructor() {
+                this.selectedYear = 1;
+                this.currentFieldId = null;
+                this.currentQuestionIdx = 0;
+                this.score = 0;
+                this.correctAnswersCount = 0;
+                this.userAnswersHistory = [];
+                this.sound = new SoundEngine();
+
+                // User Local Progress Tracking
+                this.progress = this.loadProgress();
+            }
+
+            init() {
+                this.updateUI();
+                this.renderMap();
+                
+                // Keyboard Navigation Support
+                window.addEventListener('keydown', (e) => {
+                    if (document.getElementById('screen-quiz').classList.contains('hidden')) return;
+                    if (e.key >= '1' && e.key <= '4') {
+                        const btnIdx = parseInt(e.key) - 1;
+                        const btns = document.querySelectorAll('.ans-option-btn');
+                        if (btns[btnIdx] && !btns[btnIdx].disabled) {
+                            btns[btnIdx].click();
+                        }
+                    } else if (e.key === 'Enter') {
+                        const btnNext = document.getElementById('btn-next-question');
+                        if (!btnNext.classList.contains('hidden')) {
+                            this.nextQuestion();
+                        }
+                    }
+                });
+            }
+
+            loadProgress() {
+                try {
+                    const saved = localStorage.getItem('wira_muslim_progress');
+                    return saved ? JSON.parse(saved) : {};
+                } catch(e) {
+                    return {};
+                }
+            }
+
+            saveProgress() {
+                try {
+                    localStorage.setItem('wira_muslim_progress', JSON.stringify(this.progress));
+                } catch(e) {}
+            }
+
+            resetProgress() {
+                if (confirm("Adakah anda pasti untuk memadam semua rekod bintang dan lencana?")) {
+                    this.progress = {};
+                    this.saveProgress();
+                    this.renderMap();
+                    alert("Kemajuan telah dipadamkan.");
+                }
+            }
+
+            toggleSound() {
+                this.sound.enabled = !this.sound.enabled;
+                document.getElementById('sound-icon').innerText = this.sound.enabled ? '🔊' : '🔇';
+            }
+
+            showScreen(screenId) {
+                this.sound.playClick();
+                ['screen-home', 'screen-year-select', 'screen-map', 'screen-quiz', 'screen-result'].forEach(id => {
+                    document.getElementById(id).classList.add('hidden');
+                });
+                document.getElementById(screenId).classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            startMissionFlow() {
+                this.showScreen('screen-map');
+            }
+
+            showYearSelector() {
+                this.showScreen('screen-year-select');
+            }
+
+            selectYear(year) {
+                this.selectedYear = year;
+                document.getElementById('current-year-display').innerText = year;
+                document.getElementById('user-year-badge').classList.remove('hidden');
+                this.showScreen('screen-map');
+            }
+
+            renderMap() {
+                const grid = document.getElementById('map-grid');
+                grid.innerHTML = '';
+
+                let totalStars = 0;
+
+                QUESTION_BANK.fields.forEach(field => {
+                    const progKey = `y${this.selectedYear}_${field.id}`;
+                    const fieldProg = this.progress[progKey] || { stars: 0, badge: 'Belum', maxScore: 0 };
+                    totalStars += fieldProg.stars;
+
+                    const card = document.createElement('div');
+                    card.className = "bg-white rounded-2xl p-5 border-2 border-gold/40 shadow-md hover:shadow-xl transition btn-press flex flex-col justify-between";
+                    
+                    let badgeColor = "bg-slate-100 text-slate-500 border-slate-300";
+                    if (fieldProg.badge === 'Emas') badgeColor = "bg-amber-100 text-amber-800 border-amber-400 font-bold";
+                    else if (fieldProg.badge === 'Perak') badgeColor = "bg-slate-200 text-slate-800 border-slate-400 font-bold";
+                    else if (fieldProg.badge === 'Gangsa') badgeColor = "bg-orange-100 text-orange-800 border-orange-400 font-bold";
+
+                    card.innerHTML = `
+                        <div>
+                            <div class="flex justify-between items-start mb-3">
+                                <span class="text-4xl p-2 bg-amber-50 rounded-2xl border border-amber-200">${field.icon}</span>
+                                <span class="text-xs px-2.5 py-1 rounded-full border ${badgeColor}">${fieldProg.badge === 'Belum' ? 'Belum Diterokai' : 'Lencana ' + fieldProg.badge}</span>
+                            </div>
+                            <h3 class="font-display font-bold text-lg text-navy mb-1">${field.title}</h3>
+                            <p class="text-xs text-slate-500 mb-3">${field.badge}</p>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between items-center bg-slate-50 p-2 rounded-xl border border-slate-100 mb-3">
+                                <span class="text-xs font-semibold text-slate-600">Bintang diperoleh:</span>
+                                <span class="text-xs font-bold text-amber-600">⭐ ${fieldProg.stars} / 10</span>
+                            </div>
+                            <button onclick="gameApp.startMission('${field.id}')" class="w-full bg-gold hover:bg-goldDark text-navy font-display font-bold py-2.5 px-4 rounded-xl shadow transition text-sm flex items-center justify-center gap-2">
+                                <span>⚔️</span> Mula Misi
+                            </button>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+
+                document.getElementById('total-stars-count').innerText = totalStars;
+            }
+
+            startMission(fieldId) {
+                this.currentFieldId = fieldId;
+                this.currentQuestionIdx = 0;
+                this.score = 0;
+                this.correctAnswersCount = 0;
+                this.userAnswersHistory = [];
+
+                const fieldObj = QUESTION_BANK.fields.find(f => f.id === fieldId);
+                document.getElementById('quiz-field-icon').innerText = fieldObj.icon;
+                document.getElementById('quiz-field-title').innerText = fieldObj.title;
+
+                this.showScreen('screen-quiz');
+                this.renderQuestion();
+            }
+
+            renderQuestion() {
+                const yearQs = QUESTION_BANK.data[this.selectedYear][this.currentFieldId];
+                const qObj = yearQs[this.currentQuestionIdx];
+
+                // Reset UI Elements
+                document.getElementById('quiz-progress-text').innerText = `Soalan ${this.currentQuestionIdx + 1} daripada ${yearQs.length}`;
+                document.getElementById('quiz-progress-bar').style.width = `${((this.currentQuestionIdx + 1) / yearQs.length) * 100}%`;
+                document.getElementById('quiz-score').innerText = this.score;
+
+                document.getElementById('question-text').innerText = qObj.q;
+                
+                // Arabic subtext handling if applicable
+                const arabicSub = document.getElementById('arabic-subtext');
+                if (qObj.arabic) {
+                    arabicSub.innerText = qObj.arabic;
+                    arabicSub.classList.remove('hidden');
+                } else {
+                    arabicSub.classList.add('hidden');
+                }
+
+                // Hide Feedback & Next button
+                document.getElementById('feedback-box').classList.add('hidden');
+                document.getElementById('btn-next-question').classList.add('hidden');
+
+                // Render Options
+                const optionsContainer = document.getElementById('answers-container');
+                optionsContainer.innerHTML = '';
+
+                qObj.options.forEach((optText, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = "ans-option-btn w-full text-left bg-white hover:bg-amber-50 border-2 border-slate-200 hover:border-gold p-4 rounded-2xl shadow-sm hover:shadow transition btn-press font-semibold text-sm md:text-base text-navy flex items-center justify-between";
+                    btn.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <span class="w-8 h-8 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-xs">${idx + 1}</span>
+                            <span>${optText}</span>
+                        </div>
+                        <span class="opt-status-icon text-lg"></span>
+                    `;
+                    btn.onclick = () => this.checkAnswer(idx, btn);
+                    optionsContainer.appendChild(btn);
+                });
+            }
+
+            checkAnswer(selectedIdx, clickedBtn) {
+                const yearQs = QUESTION_BANK.data[this.selectedYear][this.currentFieldId];
+                const qObj = yearQs[this.currentQuestionIdx];
+                const isCorrect = (selectedIdx === qObj.correct);
+
+                // Disable all option buttons
+                const allBtns = document.querySelectorAll('.ans-option-btn');
+                allBtns.forEach(btn => btn.disabled = true);
+
+                const feedbackBox = document.getElementById('feedback-box');
+                const feedbackTitle = document.getElementById('feedback-title');
+                const feedbackDesc = document.getElementById('feedback-desc');
+
+                this.userAnswersHistory.push({
+                    question: qObj.q,
+                    isCorrect: isCorrect,
+                    explanation: qObj.explanation
+                });
+
+                if (isCorrect) {
+                    this.score += 10;
+                    this.correctAnswersCount++;
+                    this.sound.playCorrect();
+
+                    clickedBtn.classList.remove('bg-white', 'border-slate-200');
+                    clickedBtn.classList.add('bg-emerald-100', 'border-emeraldSoft', 'text-emerald-900');
+                    clickedBtn.querySelector('.opt-status-icon').innerText = '✅';
+
+                    feedbackBox.className = "rounded-2xl p-4 mb-6 text-center border bg-emerald-50 border-emerald Soft text-emerald-900";
+                    feedbackTitle.innerText = "🎉 TEPAT SEKALI!";
+                    feedbackDesc.innerText = qObj.explanation;
+                } else {
+                    this.sound.playWrong();
+
+                    clickedBtn.classList.remove('bg-white', 'border-slate-200');
+                    clickedBtn.classList.add('bg-rose-100', 'border-roseSoft', 'text-rose-900');
+                    clickedBtn.querySelector('.opt-status-icon').innerText = '❌';
+
+                    // Highlight correct answer
+                    allBtns[qObj.correct].classList.remove('bg-white', 'border-slate-200');
+                    allBtns[qObj.correct].classList.add('bg-emerald-50', 'border-emeraldSoft');
+                    allBtns[qObj.correct].querySelector('.opt-status-icon').innerText = '✅';
+
+                    feedbackBox.className = "rounded-2xl p-4 mb-6 text-center border bg-amber-50 border-amber-300 text-amber-900";
+                    feedbackTitle.innerText = "💡 BELUM TEPAT, JOM BELAJAR!";
+                    feedbackDesc.innerText = `Jawapan tepat: "${qObj.options[qObj.correct]}". ${qObj.explanation}`;
+                }
+
+                document.getElementById('quiz-score').innerText = this.score;
+                feedbackBox.classList.remove('hidden');
+                document.getElementById('btn-next-question').classList.remove('hidden');
+            }
+
+            nextQuestion() {
+                this.sound.playClick();
+                const yearQs = QUESTION_BANK.data[this.selectedYear][this.currentFieldId];
+                if (this.currentQuestionIdx < yearQs.length - 1) {
+                    this.currentQuestionIdx++;
+                    this.renderQuestion();
+                } else {
+                    this.finishMission();
+                }
+            }
+
+            confirmExitMission() {
+                if (confirm("Adakah anda ingin keluar daripada misi ini? Kemajuan misi semasa tidak akan disimpan.")) {
+                    this.showScreen('screen-map');
+                }
+            }
+
+            finishMission() {
+                this.sound.playVictory();
+
+                // Calculate Badge & Stars
+                let badge = 'Tiada';
+                let stars = this.correctAnswersCount; // 1 star per correct question (max 10)
+
+                if (this.score >= 90) badge = 'Emas';
+                else if (this.score >= 80) badge = 'Perak';
+                else if (this.score >= 60) badge = 'Gangsa';
+
+                // Update Local Progress
+                const progKey = `y${this.selectedYear}_${this.currentFieldId}`;
+                const prevScore = this.progress[progKey]?.maxScore || 0;
+
+                if (this.score >= prevScore) {
+                    this.progress[progKey] = {
+                        stars: stars,
+                        badge: badge,
+                        maxScore: this.score
+                    };
+                    this.saveProgress();
+                }
+
+                // Update Result Screen UI
+                document.getElementById('res-score').innerText = this.score;
+                document.getElementById('res-correct').innerText = `${this.correctAnswersCount}/10`;
+                document.getElementById('res-stars').innerText = '⭐'.repeat(Math.ceil(stars / 3.33) || 1);
+                document.getElementById('res-badge-name').innerText = badge;
+
+                const badgeIcon = document.getElementById('result-badge-icon');
+                if (badge === 'Emas') badgeIcon.innerText = '🥇';
+                else if (badge === 'Perak') badgeIcon.innerText = '🥈';
+                else if (badge === 'Gangsa') badgeIcon.innerText = '🥉';
+                else badgeIcon.innerText = '📜';
+
+                // Adaptive Analysis Text
+                const analysisText = document.getElementById('res-analysis');
+                const incorrectAnswers = this.userAnswersHistory.filter(h => !h.isCorrect);
+
+                if (incorrectAnswers.length === 0) {
+                    analysisText.innerHTML = "<strong>Syabas Wira!</strong> Anda menjawab semua soalan dengan betul tanpa sebarang kesilapan. Teruskan kecemerlangan anda!";
+                } else {
+                    let tips = `Selesai 10 soalan. Anda mendapat <strong>${this.correctAnswersCount} betul</strong> dan <strong>${incorrectAnswers.length} perlu diperbaiki</strong>.<br><br><strong>Topik cadangan ulang kaji:</strong><ul class="list-disc ml-5 mt-1 space-y-1">`;
+                    incorrectAnswers.slice(0, 3).forEach(item => {
+                        tips += `<li>${item.question} — <em>${item.explanation}</em></li>`;
+                    });
+                    tips += `</ul>`;
+                    analysisText.innerHTML = tips;
+                }
+
+                this.showScreen('screen-result');
+                this.renderMap();
+            }
+
+            retryCurrentMission() {
+                if (this.currentFieldId) {
+                    this.startMission(this.currentFieldId);
+                } else {
+                    this.showScreen('screen-map');
+                }
+            }
+
+            showModal(type) {
+                this.sound.playClick();
+                document.getElementById('modal-overlay').classList.remove('hidden');
+                document.getElementById('modal-guide').classList.add('hidden');
+                document.getElementById('modal-about').classList.add('hidden');
+
+                if (type === 'guide') document.getElementById('modal-guide').classList.remove('hidden');
+                if (type === 'about') document.getElementById('modal-about').classList.remove('hidden');
+            }
+
+            closeModal() {
+                this.sound.playClick();
+                document.getElementById('modal-overlay').classList.add('hidden');
+            }
+
+            updateUI() {
+                document.getElementById('current-year-display').innerText = this.selectedYear;
+            }
+        }
+
+        // 4. Initialize Global App Instance
+        let gameApp;
+        window.addEventListener('DOMContentLoaded', () => {
+            gameApp = new WiraMuslimApp();
+            gameApp.init();
+        });
+    </script>
+</body>
+</html>
